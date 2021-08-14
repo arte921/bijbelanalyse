@@ -1,32 +1,54 @@
 const readJSONSync = require('./functies/readJSONSync.js');
+const {
+    loopObject,
+    objectNaarArray
+} = require('./functies/loopObject.js');
+
+const {
+    TekstReferentie
+} = require('./klassen/tekstreferentie.js');
+
+const {
+    Woord
+} = require('./klassen/woord.js');
 
 const bijbel = readJSONSync('statenvertaling');
 
 const boeken = bijbel.version;
 
-let alle_tekst = '';
+const voorkomsten = {};
 
-for (const boeknummer in boeken) {
-    const boek = boeken[boeknummer];
-
-    const hoofdstukken = boek.book;
-
-    for (const hoofdstuknummer in hoofdstukken) {
-        const hoofdstuk = hoofdstukken[hoofdstuknummer];
-
-        const verzen = hoofdstuk.chapter;
-
-        for (const versnummer in verzen) {
-            const vers = verzen[versnummer];
-
+loopObject(boeken, (boek) => {
+    loopObject(boek.book, (hoofdstuk) => {
+        loopObject(hoofdstuk.chapter, (vers) => {
             const vers_tekst = vers.verse;
+
+            const tekstReferentie = new TekstReferentie(boek.book_name, hoofdstuk.chapter_number, vers.verse_number);
 
             const vers_tekst_geen_newline = vers_tekst.replace(/\r\n$/, '');
 
-            alle_tekst += vers_tekst_geen_newline + '\n';
-            // console.log(vers_tekst_geen_newline);
-        }
-    }
-}
 
-console.log(alle_tekst);
+            const woorden = vers_tekst_geen_newline
+                .split(/[^A-Za-z]+/)
+                .filter((woord) => woord.length > 0);
+
+            const woorden_lowercase = woorden.map((woord) => woord.toLowerCase());
+
+            for (const woord of woorden_lowercase) {
+                const voorkomst = voorkomsten[woord];
+                if (voorkomst) {
+                    voorkomst.nieuweVoorkomst(tekstReferentie);
+                } else {
+                    voorkomsten[woord] = new Woord(tekstReferentie, woord);
+                }
+            }
+        })
+    })
+});
+
+const voorkomsten_array = objectNaarArray(voorkomsten)
+    .map((waarde) => waarde.waarde);
+
+voorkomsten_array.sort((a, b) => b.aantal - a.aantal);
+
+console.log(voorkomsten_array.map((voorkomst) => voorkomst.samenvatting()));
