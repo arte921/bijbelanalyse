@@ -49,6 +49,20 @@ loopObject(boeken, (boek) => {
 const voorkomsten_array = objectNaarArray(voorkomsten)
     .map((waarde) => waarde.waarde);
 
-voorkomsten_array.sort((a, b) => b.aantal - a.aantal);
+voorkomsten_array.sort((a, b) => {
+    if (a.aantal == b.aantal) {
+        if (a.woord < b.woord) {
+            return -1
+        } else {
+            return 1
+        }
+    } else {
+        return b.aantal - a.aantal;
+    }
+});
 
-console.log(voorkomsten_array.map((voorkomst) => voorkomst.samenvatting()));
+const voorkomsten_csv = voorkomsten_array
+    .map((voorkomst) => voorkomst.csv())
+    .join('\n');
+
+console.log(voorkomsten_csv);

@@ -18,6 +18,10 @@ class Woord {
             aantal: this.aantal
         };
     }
+
+    csv() {
+        return `${this.woord},${this.aantal}`;
+    }
 }
 
 module.exports = {
