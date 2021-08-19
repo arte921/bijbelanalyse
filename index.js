@@ -12,20 +12,23 @@ const {
     Woord
 } = require('./klassen/woord.js');
 
-const bijbel = readJSONSync('statenvertaling');
+const bijbel = readJSONSync('kjv');
 
 const boeken = bijbel.version;
 
 const voorkomsten = {};
 
+let alleTeksten = [];
 loopObject(boeken, (boek) => {
     loopObject(boek.book, (hoofdstuk) => {
         loopObject(hoofdstuk.chapter, (vers) => {
             const vers_tekst = vers.verse;
-
-            const tekstReferentie = new TekstReferentie(boek.book_name, hoofdstuk.chapter_number, vers.verse_number);
-
             const vers_tekst_geen_newline = vers_tekst.replace(/\r\n$/, '');
+            const tekstReferentie = new TekstReferentie(boek.book_name, hoofdstuk.chapter_nr, vers.verse_nr);
+
+            const versRegel = `${tekstReferentie.toString()} ${vers_tekst_geen_newline}`;
+
+            alleTeksten.push(versRegel);
 
 
             const woorden = vers_tekst_geen_newline
@@ -45,6 +48,9 @@ loopObject(boeken, (boek) => {
         })
     })
 });
+
+console.log(alleTeksten.join('\n'));
+return;
 
 const voorkomsten_array = objectNaarArray(voorkomsten)
     .map((waarde) => waarde.waarde);
