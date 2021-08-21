@@ -12,7 +12,7 @@ const {
     Woord
 } = require('./klassen/woord.js');
 
-const bijbel = readJSONSync('kjv');
+const bijbel = readJSONSync('bhs');
 
 const boeken = bijbel.version;
 
