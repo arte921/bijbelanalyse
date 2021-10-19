@@ -1,74 +1,34 @@
-const readJSONSync = require('./functies/readJSONSync.js');
-const {
-    loopObject,
-    objectNaarArray
-} = require('./functies/loopObject.js');
+// https://github.com/getbible/v1/blob/master/translations.json
 
-const {
-    TekstReferentie
-} = require('./klassen/tekstreferentie.js');
+const readJSON = require('./functies/readJSON.js');
+const writeTXT = require('./functies/writeTXT.js');
+const haalBijbelOp = require('./functies/haalBijbelOp.js');
+const loopObject = require('./functies/loopObject.js');
+const TekstReferentie = require('./klassen/tekstreferentie.js');
 
-const {
-    Woord
-} = require('./klassen/woord.js');
+const downloadVertaling = async (vertaling) => {
+    const bijbel = await haalBijbelOp(vertaling);
 
-const bijbel = readJSONSync('bhs');
+    let alleverzen = [];
+    loopObject(bijbel.version, (boek) => {
+        loopObject(boek.book, (hoofdstuk) => {
+            loopObject(hoofdstuk.chapter, (vers) => {
+                const vers_tekst_geen_newline = vers.verse.replace(/\r\n$/, '');
+                const tekstReferentie = new TekstReferentie(boek.book_name, hoofdstuk.chapter_nr, vers.verse_nr, vers_tekst_geen_newline);
+                const versRegel = `${tekstReferentie.toString()} ${vers_tekst_geen_newline}`;
 
-const boeken = bijbel.version;
+                alleverzen.push(versRegel);
+            });
+        });
+    });
 
-const voorkomsten = {};
+    writeTXT(alleverzen.join("\n"), vertaling);
+};
 
-let alleTeksten = [];
-loopObject(boeken, (boek) => {
-    loopObject(boek.book, (hoofdstuk) => {
-        loopObject(hoofdstuk.chapter, (vers) => {
-            const vers_tekst = vers.verse;
-            const vers_tekst_geen_newline = vers_tekst.replace(/\r\n$/, '');
-            const tekstReferentie = new TekstReferentie(boek.book_name, hoofdstuk.chapter_nr, vers.verse_nr);
-
-            const versRegel = `${tekstReferentie.toString()} ${vers_tekst_geen_newline}`;
-
-            alleTeksten.push(versRegel);
-
-
-            const woorden = vers_tekst_geen_newline
-                .split(/[^A-Za-z]+/)
-                .filter((woord) => woord.length > 0);
-
-            const woorden_lowercase = woorden.map((woord) => woord.toLowerCase());
-
-            for (const woord of woorden_lowercase) {
-                const voorkomst = voorkomsten[woord];
-                if (voorkomst) {
-                    voorkomst.nieuweVoorkomst(tekstReferentie);
-                } else {
-                    voorkomsten[woord] = new Woord(tekstReferentie, woord);
-                }
-            }
-        })
+(async () => {
+    const vertalingen = await readJSON('translations');
+    
+    loopObject(vertalingen, (vertaling) => {
+        downloadVertaling(vertaling.filename);
     })
-});
-
-console.log(alleTeksten.join('\n'));
-return;
-
-const voorkomsten_array = objectNaarArray(voorkomsten)
-    .map((waarde) => waarde.waarde);
-
-voorkomsten_array.sort((a, b) => {
-    if (a.aantal == b.aantal) {
-        if (a.woord < b.woord) {
-            return -1
-        } else {
-            return 1
-        }
-    } else {
-        return b.aantal - a.aantal;
-    }
-});
-
-const voorkomsten_csv = voorkomsten_array
-    .map((voorkomst) => voorkomst.csv())
-    .join('\n');
-
-console.log(voorkomsten_csv);
+})();
