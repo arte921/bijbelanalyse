@@ -13,7 +13,4 @@ const objectNaarArray = (object) => {
     return array;
 };
 
-module.exports = {
-    loopObject,
-    objectNaarArray
-};
+module.exports = loopObject;
