@@ -2,15 +2,26 @@ import puppeteer from 'puppeteer';
 
 const browser = await puppeteer.launch();
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 const page = async (url) => {
     const page = await browser.newPage();
     await page.goto(url);
     return page;
 };
 
-const allesUit = async (url, selector, callback) => await (await page(url)).evaluate(`Array.from(document.querySelectorAll("${selector}")).map(${callback.toString()})`)
+let openPages = 0;
+const allesUit = async (url, selector, callback) => {
+    while (openPages > 120) await sleep(100);
+    openPages++;
+    const p = await page(url);
+    const r = await p.evaluate(`Array.from(document.querySelectorAll("${selector}")).map(${callback.toString()})`);
+    await p.close();
+    openPages--;
+    return r;
+};
 
-const boeken = async (testament) => allesUit(testament, `#inhoud > tbody > tr > td a`, b => b.href);
+const boeken = async (testament) => allesUit(testament, `#inhoud a`, b => b.href);
 const hoofdstukken = async (boek) => allesUit(boek, `#boeklijst > div > a`, b => [b.href, b.innerText]);
 const verzen = async (hoofdstuk) => allesUit(hoofdstuk, `#tekst > p`, l => l.innerText);
 
