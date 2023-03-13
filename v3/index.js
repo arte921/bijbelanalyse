@@ -1,29 +1,32 @@
 import puppeteer from 'puppeteer';
 
 const browser = await puppeteer.launch();
-const page = await browser.newPage();
 
-await page.goto('https://www.statenvertaling.net/nieuwe-testament.html');
+const page = async (url) => {
+    const page = await browser.newPage();
+    await page.goto(url);
+    return page;
+};
 
-// console.log(await page.$$eval(`#inhoud > tbody > tr > td`, (e) => e.innerHTML))
-await page.goto('https://www.statenvertaling.net/nieuwe-testament.html');
-const boeken = (await Promise.all((await page.evaluate(() => Array.from(document.querySelectorAll(`#inhoud > tbody > tr > td > a`)).map(b => b.href))
-    ).map(async (boek) => {
-        console.log(boek);
-        const page = await browser.newPage();
-        await page.goto(boek);
-        const e = await page.evaluate(() => Array.from(document.querySelectorAll(`#boeklijstkollinks > a`)).map(b => [b.href, b.innerText]))
-        await page.close();
-        return e;
-    }))).map(async (boek) => boek.map(([hoofdstukUrl, hoofdstukNaam]) => {
-        const page = await browser.newPage();
-        await page.goto(hoofdstukUrl);
-        console.log(await page.evaluate(() => Array.from(document.querySelectorAll(`#tekst > p`)).map(l => l.innerText)))
-        await page.close();
-        return e;
-    })
+const allesUit = async (url, selector, callback) => await (await page(url)).evaluate(`Array.from(document.querySelectorAll("${selector}")).map(${callback.toString()})`)
+
+const boeken = async (testament) => allesUit(testament, `#inhoud > tbody > tr > td a`, b => b.href);
+const hoofdstukken = async (boek) => allesUit(boek, `#boeklijst > div > a`, b => [b.href, b.innerText]);
+const verzen = async (hoofdstuk) => allesUit(hoofdstuk, `#tekst > p`, l => l.innerText);
 
 
+// console.log(await boeken(`https://www.statenvertaling.net/nieuwe-testament.html`));
+// console.log(await hoofdstukken(`https://www.statenvertaling.net/bijbel/judas.html`));
+// console.log(await verzen(`https://www.statenvertaling.net/bijbel/rome/6.html`));
+
+console.log((await Promise.all([
+    `https://www.statenvertaling.net/oude-testament.html`,
+    `https://www.statenvertaling.net/nieuwe-testament.html`
+].map(async (testament) => (await Promise.all((await boeken(testament)).map(async (boek) =>
+    await Promise.all((await hoofdstukken(boek)).map(async ([hoofdstukurl, hoofdstuknaam]) =>
+        (await verzen(hoofdstukurl)).map((vers) => `${hoofdstuknaam} ${vers}`)
+    ))
+)))))).flat(5).join("\n"));
 
 
 
