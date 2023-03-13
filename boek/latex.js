@@ -14,13 +14,6 @@ import fs from "fs";
 const bijbel = fs.readFileSync(0).toString();
 
 console.log([
-    // `
-    // <style>
-    //     h2 {
-    //         border-bottom: 0px;
-    //     }
-    //     </style>
-    // `,
     Object.entries(bijbel.split("\n").group((l) => l.replace(regex, "$1$2"))).map(([hoofdstuk, verzen]) => [
         `<h2>${hoofdstuk}</h2>`,
         `<p>`,
