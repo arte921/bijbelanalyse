@@ -14,20 +14,21 @@ import fs from "fs";
 const bijbel = fs.readFileSync(0).toString();
 
 console.log([
-    `\\documentclass[fontsize=11pt,paper=a5,pagesize=auto]{scrbook}`,
-    `\\usepackage[utf8]{inputenc}`,
-    `\\usepackage[T1]{fontenc}`,
-    `\\usepackage{lmodern}`,
-    `\\usepackage{microtype}`,
-    `\\frenchspacing`,
-    `\\begin{document}`,
-    Object.entries(bijbel.split("\n").group((l) => l.replace(regex, "$1$2"))).slice(-2).map(([hoofdstuk, verzen]) => [
-        `\\chapter{${hoofdstuk}}`,
+    // `
+    // <style>
+    //     h2 {
+    //         border-bottom: 0px;
+    //     }
+    //     </style>
+    // `,
+    Object.entries(bijbel.split("\n").group((l) => l.replace(regex, "$1$2"))).map(([hoofdstuk, verzen]) => [
+        `<h2>${hoofdstuk}</h2>`,
+        `<p>`,
         verzen.map((vers) => {
             const versnummer = vers.replace(regex, "$3");
             const versinhoud = vers.replace(regex, "$4");
-            return `$^{${versnummer}}$ ${versinhoud}`;
-        }).join(" ")
+            return `<sup><sub>${versnummer}</sub></sup> ${versinhoud}`;
+        }).join(" "),
+        `</p>`
     ]),
-    `\\end{document}`,
 ].flat(10).join("\n"))
