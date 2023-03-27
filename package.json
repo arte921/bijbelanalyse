@@ -12,12 +12,17 @@
   },
   "author": "",
   "license": "ISC",
-  "type": "module",
   "dependencies": {
     
   },
   "bugs": {
     "url": "https://github.com/arte921/bijbelanalyse/issues"
   },
-  "homepage": "https://github.com/arte921/bijbelanalyse#readme"
+  "homepage": "https://github.com/arte921/bijbelanalyse#readme",
+  "imports": {
+    "#f/*": {
+      "default": "./functies/*"
+    }
+  },
+  "type": "module"
 }
