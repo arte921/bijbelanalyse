@@ -1,15 +1,15 @@
-import YAML from "yaml";
+// import YAML from "yaml";
 import fss from "fs";
-import fs from "fs/promises";
+const fs = fss.promises;
 
 // parse
 const pcsv = (csv, separator = ",") => csv.split("\n").map(l => l.split(separator)).slice(1).filter(l => l.length > 1);
-const pyaml = YAML.parse;
+const pyaml = undefined//YAML.parse;
 
 // generate
 const gtxt = (data) => [data].flat(30).join("\n");
 const gcsv = (data, separator = ",") => data.map((a) => [a].flat(9).join(separator)).join("\n");
-const gyaml = YAML.stringify;
+const gyaml = undefined//YAML.stringify;
 
 // read
 const rtxt = () => fss.readFileSync(0).toString();
