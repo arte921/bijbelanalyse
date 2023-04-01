@@ -41,19 +41,18 @@ Array.prototype.findLastIndex = function(callback) {
     const boeknamen = verzen.unique(v => v.replace(bijbelregex, "$1"));
 
         
-    const leesvoer = psalmbord.split(/[\n,]/).map((stuk) => {
+    const leesvoer = psalmbord.split(/[\n,]/).filter(e => e.trim().length > 0).map((stuk) => {
         const [begin, einde = begin] = stuk.split(/-/).map((verwijzing) => {
-            const p = vervangLaatste(context, verwijzing.split(/ |:/));
+            const p = vervangLaatste(context, verwijzing.split(/(?:(?<=[a-z]) )|:/));
             const [boek, ...rest] = (p[1].match(/[a-zA-Z]/) ? p.slice(1) : p).map(e => e.replace(";", "[0-9]+").trim());
             const tekst = [boeknamen.ongeveer(boek), ...rest];
+            console.log(boek, tekst)
             context = tekst;
-            // console.log(context);
             return tekst;
         }).map(v => v.join(" "));
 
         const [a, b] = ([begin, einde].map(e => verzen.findLastIndex((v) => v.match(new RegExp(`^${e} `)))));
         
-        // console.log(begin, einde, a, b, verzen.slice(a, b + 1))
         return verzen.slice(a, b + 1)
     })
 
