@@ -46,7 +46,6 @@ Array.prototype.findLastIndex = function(callback) {
             const p = vervangLaatste(context, verwijzing.split(/(?:(?<=[a-z]) )|:/));
             const [boek, ...rest] = (p[1].match(/[a-zA-Z]/) ? p.slice(1) : p).map(e => e.replace(";", "[0-9]+").trim());
             const tekst = [boeknamen.ongeveer(boek), ...rest];
-            console.log(boek, tekst)
             context = tekst;
             return tekst;
         }).map(v => v.join(" "));
