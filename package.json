@@ -12,8 +12,8 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    
+  "dependencies": {    
+    "string-similarity": "4.0.4"
   },
   "bugs": {
     "url": "https://github.com/arte921/bijbelanalyse/issues"
