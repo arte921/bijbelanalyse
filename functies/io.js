@@ -22,6 +22,8 @@ const wcsv = (data) => console.log(gcsv(data));
 const wyaml = (data) => console.log(gyaml(data));
 const wtxt = (data) => console.log(gtxt(data));
 
+const arg = process.argv.slice(2);
+
 export {
     pcsv,
     pyaml,
@@ -34,6 +36,7 @@ export {
     wcsv,
     wyaml,
     wtxt,
-    stdin
+    stdin,
+    arg
 };
 
