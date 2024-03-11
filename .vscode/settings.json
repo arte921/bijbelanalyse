@@ -4,4 +4,7 @@
 	"markdown-pdf.headerTemplate": "<div></div>",
 	"markdown-pdf.breaks": true,
 	// "markdown-pdf.scale": 0.8,
+
+	// Auto update TOC on save.
+	"markdown.extension.toc.updateOnSave": false,
 }
