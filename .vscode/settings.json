@@ -1,5 +1,5 @@
 {
-    "markdown-pdf.outputDirectory": "./pdf",
+    "markdown-pdf.outputDirectory": "./docs",
 	"markdown-pdf.footerTemplate": "<div style=\"font-size: 13px; margin: 0 auto;\"> <span class='pageNumber'></span></div>",
 	"markdown-pdf.headerTemplate": "<div></div>",
 	"markdown-pdf.breaks": true,
